@@ -5,16 +5,15 @@ const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const cors = require('cors');
-const { corsOptions } = require('./helpers/corsOptions');
 const limit = require('./helpers/limit');
-const { BD, PORT_NUMBER } = require('./helpers/config');
+const { BD, PORT_NUMBER, CORS_OPTIONS } = require('./helpers/config');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { centralError } = require('./helpers/centralError');
 const router = require('./routes/index');
 
 const app = express();
 
-app.use('*', cors(corsOptions));
+app.use('*', cors(CORS_OPTIONS));
 
 const { PORT = PORT_NUMBER, LINK, NODE_ENV } = process.env;
 mongoose.connect(NODE_ENV === 'production' ? LINK : BD, {
