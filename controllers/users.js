@@ -43,19 +43,23 @@ const updateCurrentUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email })
+    .select('+password')
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' },
-      );
-
-      res.send({ token });
-    })
-    .catch((err) => {
-      throw new Unauthorized(err.message);
+      if (!user) {
+        throw new Unauthorized('Неправильные почта или пароль');
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new Unauthorized('Неправильные почта или пароль');
+        }
+        const token = jwt.sign(
+          { _id: user._id },
+          NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+          { expiresIn: '7d' },
+        );
+        return res.status(200).send({ token });
+      });
     })
     .catch(next);
 };
@@ -78,9 +82,10 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequest(err.message);
       }
-      if (err.code === 409) {
+      if (err.code === 11000) {
         throw new Conflict(err.message);
       }
+      next(err);
     })
     .catch(next);
 };

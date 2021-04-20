@@ -1,28 +1,23 @@
 require('dotenv').config();
-
 const express = require('express');
 const mongoose = require('mongoose');
-
 const bodyParser = require('body-parser');
-
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const cors = require('cors');
 const { corsOptions } = require('./helpers/corsOptions');
-
 const limit = require('./helpers/limit');
-
+const { BD, PORT_NUMBER } = require('./helpers/config');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
+const { centralError } = require('./helpers/centralError');
 const router = require('./routes/index');
 
 const app = express();
 
 app.use('*', cors(corsOptions));
 
-const { PORT = 3000 } = process.env;
-
-mongoose.connect('mongodb://localhost:27017/movies-explorer-db', {
+const { PORT = PORT_NUMBER, LINK, NODE_ENV } = process.env;
+mongoose.connect(NODE_ENV === 'production' ? LINK : BD, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -50,13 +45,6 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-  next();
-});
+app.use(centralError);
 
 app.listen(PORT);
