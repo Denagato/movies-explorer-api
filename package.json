@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ialse/movies-explorer-api.git"
+    "url": "git+https://github.com/Denagato/movies-explorer-api.git"
   },
   "keywords": [],
-  "author": "Igumnov Aleksey",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ialse/movies-explorer-api/issues"
+    "url": "https://github.com/Denagato/movies-explorer-api/issues"
   },
-  "homepage": "https://github.com/ialse/movies-explorer-api#readme",
+  "homepage": "https://github.com/Denagato/movies-explorer-api#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
