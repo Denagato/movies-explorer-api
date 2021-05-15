@@ -1,8 +1,10 @@
-const userRouter = require('express').Router();
-const { validateId, validateUpdateCurrentUser } = require('../helpers/validation');
-const { getCurrentUser, updateCurrentUser } = require('../controllers/users');
+const router = require('express').Router();
 
-userRouter.get('/users/me', validateId, getCurrentUser);
-userRouter.patch('/users/me', validateUpdateCurrentUser, updateCurrentUser);
+const getUser = require('../controllers/users/get-user');
+const updateUser = require('../controllers/users/update-user');
+const { validateUpdateUser } = require('../helpers/validation');
 
-module.exports = userRouter;
+router.get('/me', getUser);
+router.patch('/me', validateUpdateUser, updateUser);
+
+module.exports = router;

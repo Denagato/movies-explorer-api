@@ -1,39 +1,32 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+const validatorLib = require('validator');
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
   email: {
-    required: true,
     type: String,
+    required: [true, 'Поле Email обязательно!'],
     unique: true,
     validate: {
-      validator(v) {
-        return validator.isEmail(v);
+      validator(email) {
+        return validatorLib.isEmail(email);
       },
-      message: 'Email некорректен',
+      message: 'Указанный Email некорректный',
     },
   },
   password: {
-    required: true,
     type: String,
-    minlength: 8,
+    required: [true, 'Поле Пароль обязательно!'],
+    minlength: [8, 'Минимальная длина 8 символов'],
     select: false,
-    validate: {
-      validator(v) {
-        return /[a-z0-9]*/i.test(v);
-      },
-      message: 'Пароль некорректен',
-    },
+  },
+  name: {
+    type: String,
+    default: 'Жак-Ив Кусто',
+    minlength: [2, 'Минимальная длина 2 символа'],
+    maxlength: [30, 'Максимальная длина 30 символов'],
   },
 });
 
-// eslint-disable-next-line func-names
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

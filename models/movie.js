@@ -1,49 +1,57 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+const mongoose = require("mongoose");
+const validator = require("validator");
 
 const movieSchema = new mongoose.Schema({
-  country: {
+  movieId: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 150,
+    required: [true, "Поле обязательно"],
   },
-  director: {
+  nameRU: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 150,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [150, "Максимальная длина 150 символов"],
   },
-  duration: {
-    type: Number,
-    required: true,
-  },
-  year: {
+  nameEN: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 4,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [150, "Максимальная длина 150 символов"],
   },
   description: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 10000,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [10000, "Максимальная длина 10000 символов"],
+  },
+  year: {
+    type: String,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [4, "Максимальная длина 4 символа"],
+  },
+  director: {
+    type: String,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [150, "Максимальная длина 150 символов"],
+  },
+  country: {
+    type: String,
+    required: [true, "Поле обязательно"],
+    minlength: [2, "Минимальная длина 2 символа"],
+    maxlength: [150, "Максимальная длина 150 символов"],
+  },
+  duration: {
+    type: Number,
+    required: [true, "Поле обязательно"],
   },
   image: {
     type: String,
     required: true,
     validate: {
       validator: (link) => validator.isURL(link),
-      message: 'Ссылка некорректная',
-    },
-  },
-  trailer: {
-    type: String,
-    required: true,
-    validate: {
-      validator: (link) => validator.isURL(link),
-      message: 'Ссылка некорректная',
+      message: "Ссылка некорректная",
     },
   },
   thumbnail: {
@@ -51,30 +59,22 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (link) => validator.isURL(link),
-      message: 'Ссылка некорректная',
+      message: "Ссылка некорректная",
+    },
+  },
+  trailer: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (link) => validator.isURL(link),
+      message: "Ссылка некорректная",
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: "user",
     required: true,
-  },
-  movieId: {
-    type: String,
-    required: true,
-  },
-  nameRU: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 150,
-  },
-  nameEN: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 150,
   },
 });
 
-module.exports = mongoose.model('movie', movieSchema);
+module.exports = mongoose.model("movie", movieSchema);

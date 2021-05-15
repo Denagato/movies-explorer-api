@@ -1,49 +1,39 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const { errors } = require('celebrate');
-const helmet = require('helmet');
 const cors = require('cors');
-const limit = require('./helpers/limit');
-const { BD, PORT_NUMBER, CORS_OPTIONS } = require('./helpers/config');
+const { errors } = require('celebrate');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+
+const { PORT, DB_CONN } = require('./config');
+const router = require('./routes');
+const finalErr = require('./errors/final-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { centralError } = require('./helpers/centralError');
-const router = require('./routes/index');
+const { corsOptions } = require('./helpers/cors-options');
+const limiter = require('./helpers/limiter');
 
 const app = express();
 
-app.use('*', cors(CORS_OPTIONS));
-
-const { PORT = PORT_NUMBER, LINK, NODE_ENV } = process.env;
-mongoose.connect(NODE_ENV === 'production' ? LINK : BD, {
+mongoose.connect(DB_CONN, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
-  useUnifiedTopology: true,
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use('*', cors(corsOptions));
 app.use(requestLogger);
-
+app.use(limiter);
 app.use(helmet());
+app.use(bodyParser.json());
+app.use(cookieParser());
 
-app.use(limit);
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-
-app.use('/', router);
+app.use(router);
 
 app.use(errorLogger);
-
 app.use(errors());
+app.use(finalErr);
 
-app.use(centralError);
-
-app.listen(PORT);
+app.listen(PORT, () => {
+  console.log(`Сервер работает. Порт: ${PORT}`);
+});
