@@ -2,7 +2,6 @@ const Movie = require('../models/movie');
 
 const NotFound = require('../errors/NotFound');
 const Conflict = require('../errors/Conflict');
-const BadRequest = require('../errors/BadRequest');
 const Forbidden = require('../errors/Forbidden');
 
 const getMovies = (req, res, next) => {
@@ -19,19 +18,45 @@ const getMovies = (req, res, next) => {
 };
 
 const createMovie = (req, res, next) => {
-  const owner = req.user._id;
+  const {
+    movieId,
+    nameRU,
+    nameEN,
+    description,
+    year,
+    director,
+    country,
+    duration,
+    image,
+    thumbnail,
+    trailer,
+  } = req.body;
 
-  Movie.create({ owner, ...req.body })
+  return Movie.findOne({ movieId, owner: req.user._id })
     .then((movie) => {
-      res.status(201).send({ data: movie });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequest(err.message);
-      } else if (err.code === 11000) {
-        throw new Conflict(err.message);
+      if (movie) {
+        throw new Conflict('Проблема');
       }
+      return Movie.create({
+        movieId,
+        nameRU,
+        nameEN,
+        description,
+        year,
+        director,
+        country,
+        duration,
+        image,
+        thumbnail,
+        trailer,
+        owner: req.user._id,
+      });
     })
+    .then((movie) => {
+      const { _id } = movie;
+      return Movie.findById({ _id }).populate('owner');
+    })
+    .then((movie) => res.status(200).send(movie))
     .catch(next);
 };
 
